@@ -38,3 +38,31 @@ def bootstrap(df, samplesize, nsamples, split=['new_repeat', 'service']):
         return pd.concat([get_samples(x) for x in partitions])
     else:
         return get_samples(df)
+
+
+def maketable(thing):
+    getsamplesize = lambda SE, table: table.var10k * 10000 * SE ** -2
+
+    table = volumedata[splitter + ['num_owners']]
+    table = (
+        table
+            .join(means[[thing]], on=splitter)
+            .join(var10k[[thing]], on=splitter, rsuffix='_var10k')
+            .rename(columns={thing + '_var10k': 'var10k'})
+    )
+    table['sample_size05'] = getsamplesize(.05 * table[thing] / 1.96, table).astype(int)
+    table['sample_size02'] = getsamplesize(.02 * table[thing] / 1.96, table).astype(int)
+    table['30 day detectable'] = 2.49 * np.sqrt(table.var10k * 10000 * 8 / table.num_owners) / table[thing]
+    table = (
+        table
+            .rename(
+            columns={
+                thing: 'average ' + thing
+                , 'num_owners': '30 Day Owner Volume'
+            }
+        ).drop(columns='var10k')
+            .groupby(splitter)
+            .min()
+    )
+    table['30 day detectable'] = table['30 day detectable'].apply('{:.1%}'.format)
+    return table
