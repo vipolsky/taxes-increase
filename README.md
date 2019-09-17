@@ -9,7 +9,7 @@ $ pipenv run python main.py
 
 ### Explore output and create visualizations with Jupyter:
 ```
-$ python -m ipykernel install --user --name=taxes_increase
+$ python -m ipykernel install --user --name=rover-ds-taxes-increase
 ```
 
 ### Run unittests
