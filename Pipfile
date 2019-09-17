@@ -13,3 +13,4 @@ python_version = "3.6"
 
 [packages]
 roverdata = {version = "*",index = "fury"}
+ipykernel = "*"
