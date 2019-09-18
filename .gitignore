@@ -267,4 +267,5 @@ GitHub.sublime-settings
 # ipynb checkpoints and common data file formats
 *.ipynb_checkpoints
 *.csv
+*.tsv
 *.parquet
