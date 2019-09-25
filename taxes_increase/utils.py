@@ -1,4 +1,6 @@
 import logging
+import pandas as pd
+import numpy as np
 
 
 def setup_logger(name):
@@ -9,6 +11,8 @@ def setup_logger(name):
     logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
     return logger
+
+logger = setup_logger(__name__)
 
 def bootstrap(df, samplesize, nsamples, split=['new_repeat', 'service']):
     ''' return a dataframe containing samplesize * nsamples rows from each
@@ -40,10 +44,10 @@ def bootstrap(df, samplesize, nsamples, split=['new_repeat', 'service']):
         return get_samples(df)
 
 
-def maketable(thing):
+def maketable(df, splitter, means, var10k, thing):
     getsamplesize = lambda SE, table: table.var10k * 10000 * SE ** -2
 
-    table = volumedata[splitter + ['num_owners']]
+    table = df[splitter + ['num_owners']]
     table = (
         table
             .join(means[[thing]], on=splitter)
@@ -66,3 +70,30 @@ def maketable(thing):
     )
     table['30 day detectable'] = table['30 day detectable'].apply('{:.1%}'.format)
     return table
+
+
+def split_data(df, split, **kwargs):
+    """
+    Split inputted data by the inputted list of split proportions
+
+    Args:
+        df (pandas.DataFrame): data to be split
+        split (list): list of split proportions summing to 1
+
+    Returns:
+        (dictionary):
+            keys: integers from 1 to `splits`
+            values: pandas.DataFrame's containing partial data from `data`
+    """
+    if 'seed' in kwargs:
+        np.random.seed(kwargs['seed'])
+    if sum(split) != 1 or not isinstance(split, list):
+        logger.debug('split must be a list of floats summing to one, control is at index 0')
+        raise ValueError
+    df_lens = [int(x * len(df)) for x in split]
+    del df_lens[-1]
+    df_indexes = np.cumsum(df_lens)
+    df_indexes_shifted = [x + 1 if ind > 0 else x for ind, x in enumerate(df_indexes)]
+    df_splits = np.split(df.sample(frac=1), df_indexes_shifted)
+    df_splits_dict = {i + 1: split for i, split in zip(range(len(split)), df_splits)}
+    return df_splits_dict
