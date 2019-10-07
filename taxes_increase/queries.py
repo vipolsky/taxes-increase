@@ -100,7 +100,7 @@ with
                 when requester_was_new_customer=1 then 'new' else 'repeat'
             end as new_repeat
             , case
-                when requester_was_new_customer=1 and p.added is not null then 1 else null
+                when requester_was_new_customer=1 and p.added is not null then 'new' else 'old'
             end as new_account
             , count(n.need_id) as num_needs
             , sum(booked::int) as num_booked
@@ -132,7 +132,7 @@ with
                 when requester_was_new_customer=1 then 'new' else 'repeat'
             end as new_repeat
             , case
-                when requester_was_new_customer=1 and p.added is not null then 1 else null
+                when requester_was_new_customer=1 and p.added is not null then 'new' else 'old'
             end as new_account
             , count(n.need_id) as num_needs
             , sum(booked::int) as num_booked
@@ -163,10 +163,10 @@ with
             when service_type = 'drop-in' or service_type = 'over' then 'drop-in'
             when service_type like '%walk%' then 'dog-walking'
         end as service
-        , max(case when b.stay_id = first_stay_id then 1 else 0 end) as new_repeat
+        , max(case when b.stay_id = first_stay_id then 'new' else 'repeat' end) as new_repeat
         , min(stay_added) as stay_added
         , case
-            when max(case when b.stay_id = first_stay_id then 1 end) = 1 and p.added is not null then 1 else 0
+            when max(case when b.stay_id = first_stay_id then 1 end) = 1 and p.added is not null then 'new' else 'old'
         end as new_account
     from standard_reports.bookings b
              join standard_reports.bookings_financial f
@@ -189,10 +189,10 @@ with
     select
         requester_id
         ,'*' as service
-        , max(case when b.stay_id = first_stay_id then 1 else 0 end) as new_repeat
+        , max(case when b.stay_id = first_stay_id then 'new' else 'repeat' end) as new_repeat
         , min(stay_added) as stay_added
         , case
-            when max(case when b.stay_id = first_stay_id then 1 end) = 1 and p.added is not null then 1 else 0
+            when max(case when b.stay_id = first_stay_id then 1 end) = 1 and p.added is not null then 'new' else 'old'
         end as new_account
     from standard_reports.bookings b
         join standard_reports.bookings_financial f

@@ -13,4 +13,11 @@ python_version = "3.6"
 
 [packages]
 roverdata = {version = "*",index = "fury"}
+scipy = "*"
+statsmodels = "*"
+
+[dev-packages]
+seaborn = "*"
 ipykernel = "*"
+matplotlib = "*"
+pymc3 = "*"

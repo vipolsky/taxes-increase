@@ -7,8 +7,8 @@ def main():
     conn = DataWarehouse()
 
     logger.info('fetching LTV data')
-    LTV = conn.query(["LTV"])
+    LTV = conn.query(queries_dict["LTV"])
     logger.info('fetching retransaction data')
-    retrans = conn.query(["retrans"])
+    retrans = conn.query(queries_dict["retrans"])
 
     return LTV, retrans
